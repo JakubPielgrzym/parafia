@@ -1,5 +1,3 @@
-# parafia
-parafia
 Parafia pw. Św. Jakuba Apostoła w Koziebrodach
 Strona internetowa Parafii pw. Świętego Jakuba Apostoła oraz Sanktuarium Matki Bożej Królowej Nieba w Koziebrodach.
 🌐 Adres strony
