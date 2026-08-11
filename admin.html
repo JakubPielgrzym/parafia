@@ -491,7 +491,8 @@ Wszystkich parafian zachęcamy do lektury tygodnika „Gość Niedzielny".</text
 <script>
 // ===== HASŁO =====
 const ADMIN_PASS = "koziebrody2026";
-
+    
+window.doLogin = doLogin;
 function doLogin() {
     const val = document.getElementById('loginPass').value.trim();
     if (val === ADMIN_PASS) {
