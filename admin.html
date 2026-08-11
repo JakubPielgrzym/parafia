@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel administracyjny – Parafia Koziebrody</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1e3a5f;
+    --primary-dark: #152a45;
+    --primary-light: #2c5282;
+    --accent: #d4af37;
+    --accent-light: #f0e6c3;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', sans-serif;
+    --radius: 10px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--gray-100); color: var(--gray-800); min-height: 100vh; }
+
+/* ===== LOGIN ===== */
+.login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: 20px;
+}
+.login-box {
+    background: var(--white); padding: 48px 40px; border-radius: var(--radius);
+    box-shadow: var(--shadow-lg); width: 100%; max-width: 420px; text-align: center;
+}
+.login-box .logo-icon {
+    width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; color: white; font-size: 2rem;
+}
+.login-box h1 {
+    font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;
+}
+.login-box .subtitle { color: var(--gray-600); font-size: 0.9rem; margin-bottom: 32px; }
+.login-box input {
+    width: 100%; padding: 14px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius);
+    font-size: 1rem; font-family: inherit; margin-bottom: 16px; transition: all .2s;
+}
+.login-box input:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
+.login-box button {
+    width: 100%; padding: 14px; background: var(--primary); color: white; border: none;
+    border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer;
+    transition: all .2s;
+}
+.login-box button:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.login-error {
+    color: var(--danger); font-size: 0.85rem; margin-top: 12px; display: none;
+}
+
+/* ===== ADMIN PANEL ===== */
+.admin-panel { display: none; min-height: 100vh; }
+.admin-header {
+    background: var(--white); border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px; position: sticky; top: 0; z-index: 100;
+}
+.admin-header-inner {
+    max-width: 1400px; margin: 0 auto; display: flex;
+    align-items: center; justify-content: space-between; height: 64px;
+}
+.admin-header .brand {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-heading); font-size: 1.1rem; color: var(--primary); font-weight: 600;
+}
+.admin-header .brand-icon {
+    width: 36px; height: 36px; background: var(--primary); color: white;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.admin-actions { display: flex; gap: 10px; align-items: center; }
+.admin-actions button, .admin-actions a {
+    padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
+    cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    transition: all .2s; border: 1px solid transparent;
+}
+.btn-save { background: var(--primary); color: white; border-color: var(--primary); }
+.btn-save:hover { background: var(--primary-dark); }
+.btn-preview { background: var(--white); color: var(--primary); border-color: var(--gray-200); }
+.btn-preview:hover { background: var(--gray-50); border-color: var(--primary-light); }
+.btn-download { background: var(--success); color: white; border-color: var(--success); }
+.btn-download:hover { background: #15803d; }
+.btn-logout { background: transparent; color: var(--gray-600); border-color: var(--gray-200); }
+.btn-logout:hover { color: var(--danger); border-color: var(--danger); }
+
+.admin-body {
+    max-width: 1400px; margin: 0 auto; display: grid;
+    grid-template-columns: 260px 1fr; min-height: calc(100vh - 65px);
+}
+.admin-sidebar {
+    background: var(--white); border-right: 1px solid var(--gray-200); padding: 24px 0;
+}
+.admin-sidebar nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
+.admin-sidebar a {
+    padding: 10px 14px; border-radius: 8px; text-decoration: none; color: var(--gray-700);
+    font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px;
+    transition: all .15s; cursor: pointer;
+}
+.admin-sidebar a:hover, .admin-sidebar a.active {
+    background: var(--gray-50); color: var(--primary);
+}
+.admin-sidebar a.active { background: rgba(30,58,95,0.06); font-weight: 600; }
+.admin-sidebar .nav-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+.admin-content { padding: 32px; overflow-y: auto; }
+.admin-content h2 {
+    font-family: var(--font-heading); font-size: 1.4rem; color: var(--primary);
+    margin-bottom: 6px;
+}
+.admin-content .section-desc { color: var(--gray-600); font-size: 0.9rem; margin-bottom: 28px; }
+
+/* Forms */
+.form-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;
+}
+.form-card {
+    background: var(--white); border-radius: var(--radius); padding: 28px;
+    border: 1px solid var(--gray-200); box-shadow: var(--shadow);
+}
+.form-card h3 {
+    font-family: var(--font-heading); font-size: 1.05rem; color: var(--primary);
+    margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--gray-100);
+    display: flex; align-items: center; gap: 8px;
+}
+.form-group { margin-bottom: 18px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-group label {
+    display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-700);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+}
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200);
+    border-radius: 8px; font-family: inherit; font-size: 0.95rem; color: var(--gray-800);
+    transition: all .2s; background: var(--white);
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(30,58,95,0.08);
+}
+.form-group textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-group .hint {
+    font-size: 0.78rem; color: var(--gray-400); margin-top: 4px;
+}
+.form-group .hint code {
+    background: var(--gray-100); padding: 1px 5px; border-radius: 4px; font-size: 0.75rem;
+}
+
+/* Aktualności cards */
+.akt-card {
+    background: var(--white); border-radius: var(--radius); padding: 24px;
+    border: 1px solid var(--gray-200); box-shadow: var(--shadow); margin-bottom: 20px;
+}
+.akt-card h4 {
+    font-family: var(--font-heading); font-size: 1rem; color: var(--primary);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.akt-card h4 span { background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-family: var(--font-body); }
+.akt-grid { display: grid; grid-template-columns: 80px 1fr; gap: 16px; }
+.akt-grid .form-group:first-child { grid-column: 1; }
+.akt-grid .form-group:nth-child(2) { grid-column: 2; }
+.akt-grid .form-group:nth-child(3),
+.akt-grid .form-group:nth-child(4) { grid-column: 1 / -1; }
+
+/* Toast */
+.toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--gray-800); color: white;
+    padding: 14px 24px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 500;
+    box-shadow: var(--shadow-lg); transform: translateY(100px); opacity: 0;
+    transition: all .4s cubic-bezier(0.4,0,0.2,1); z-index: 9999; display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .admin-body { grid-template-columns: 1fr; }
+    .admin-sidebar { display: none; }
+    .admin-header-inner { flex-wrap: wrap; height: auto; padding: 12px 0; gap: 10px; }
+    .admin-actions { width: 100%; justify-content: flex-end; }
+    .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <div class="logo-icon">⛪</div>
+        <h1>Panel administracyjny</h1>
+        <p class="subtitle">Parafia pw. Św. Jakuba Apostoła w Koziebrodach</p>
+        <input type="password" id="loginPass" placeholder="Wprowadź hasło dostępu..." onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="doLogin()">Zaloguj się</button>
+        <p class="login-error" id="loginError">Nieprawidłowe hasło. Spróbuj ponownie.</p>
+    </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="adminPanel">
+    <header class="admin-header">
+        <div class="admin-header-inner">
+            <div class="brand">
+                <div class="brand-icon">⚙</div>
+                <span>Panel admina – Parafia Koziebrody</span>
+            </div>
+            <div class="admin-actions">
+                <button class="btn-save" onclick="saveData()">💾 Zapisz w przeglądarce</button>
+                <a class="btn-preview" href="index.html" target="_blank">👁 Podgląd strony</a>
+                <button class="btn-download" onclick="downloadIndex()">⬇ Pobierz index.html</button>
+                <button class="btn-logout" onclick="doLogout()">Wyloguj</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-body">
+        <aside class="admin-sidebar">
+            <nav>
+                <a href="#sec-kontakt" class="nav-link active" onclick="showSection('kontakt',this)"><span class="nav-icon">📧</span> Kontakt</a>
+                <a href="#sec-kancelaria" class="nav-link" onclick="showSection('kancelaria',this)"><span class="nav-icon">🕒</span> Kancelaria</a>
+                <a href="#sec-msze" class="nav-link" onclick="showSection('msze',this)"><span class="nav-icon">✝</span> Msze Święte</a>
+                <a href="#sec-ogloszenia" class="nav-link" onclick="showSection('ogloszenia',this)"><span class="nav-icon">📜</span> Ogłoszenia</a>
+                <a href="#sec-aktualnosci" class="nav-link" onclick="showSection('aktualnosci',this)"><span class="nav-icon">📰</span> Aktualności</a>
+            </nav>
+        </aside>
+
+        <main class="admin-content">
+
+            <!-- KONTAKT -->
+            <div id="sec-kontakt" class="admin-section">
+                <h2>📧 Dane kontaktowe</h2>
+                <p class="section-desc">Edytuj informacje kontaktowe wyświetlane w stopce i na stronie głównej.</p>
+                <div class="form-grid">
+                    <div class="form-card">
+                        <h3>📍 Adres i lokalizacja</h3>
+                        <div class="form-group">
+                            <label>Adres parafii</label>
+                            <textarea id="f-kontakt-adres" rows="3">Parafia pw. Św. Jakuba Apostoła&#10;Koziebrody 48a&#10;09-140 Raciąż</textarea>
+                            <p class="hint">Każda linia będzie wyświetlana osobno. Użyj <code>&lt;br&gt;</code> jeśli potrzebujesz dodatkowej przerwy.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Diecezja / dekanat</label>
+                            <input type="text" id="f-kontakt-diecezja" value="Diecezja Płocka, Dekanat Raciąski">
+                        </div>
+                    </div>
+                    <div class="form-card">
+                        <h3>📞 Telefon i e-mail</h3>
+                        <div class="form-group">
+                            <label>Numer telefonu</label>
+                            <input type="text" id="f-kontakt-telefon" value="+48 784 843 989">
+                        </div>
+                        <div class="form-group">
+                            <label>Adres e-mail</label>
+                            <input type="text" id="f-kontakt-email" value="parafia.koziebrody@[domena].pl">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KANCELARIA -->
+            <div id="sec-kancelaria" class="admin-section" style="display:none">
+                <h2>🕒 Kancelaria parafialna</h2>
+                <p class="section-desc">Godziny urzędowania, notatki i lista spraw do załatwienia.</p>
+                <div class="form-grid">
+                    <div class="form-card">
+                        <h3>🕒 Godziny urzędowania</h3>
+                        <div class="form-group">
+                            <label>Poniedziałek</label>
+                            <input type="text" id="f-kancelaria-pon" value="16:00 – 17:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Środa</label>
+                            <input type="text" id="f-kancelaria-sro" value="16:00 – 17:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Piątek</label>
+                            <input type="text" id="f-kancelaria-pt" value="16:00 – 17:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Notatka pod tabelą</label>
+                            <input type="text" id="f-kancelaria-notatka" value="Kancelaria nieczynna podczas sprawowania liturgii w kościele.">
+                        </div>
+                    </div>
+                    <div class="form-card">
+                        <h3>📋 Sprawy do załatwienia</h3>
+                        <div class="form-group">
+                            <label>Lista spraw (każda linia = jeden punkt)</label>
+                            <textarea id="f-kancelaria-sprawy" rows="8">Zgłoszenia chrztu (minimum tydzień wcześniej)
+Przygotowanie do sakramentu bierzmowania
+Kurs przedmałżeński
+Wizyta u chorych – zgłoszenia w kancelarii
+Pogrzeby – kontakt telefoniczny</textarea>
+                            <p class="hint">Każda linia zostanie automatycznie otoczona znacznikiem <code>&lt;li&gt;</code>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MSZE -->
+            <div id="sec-msze" class="admin-section" style="display:none">
+                <h2>✝ Porządek Mszy Świętych</h2>
+                <p class="section-desc">Edytuj godziny Mszy w dni powszednie, niedziele oraz informacje o sakramentach.</p>
+                <div class="form-grid">
+                    <div class="form-card">
+                        <h3>🕐 Dni powszednie</h3>
+                        <div class="form-group">
+                            <label>Godziny Mszy (każda linia = jedna pozycja)</label>
+                            <textarea id="f-msze-powszednie" rows="6">7:00 (w niektóre dni)
+17:00 (zawsze)
+17:30 (w niektóre dni)</textarea>
+                            <p class="hint">Format: <code>godzina (opcjonalna notatka)</code>. Zostanie sformatowane jako lista z godziną wytłuszczoną.</p>
+                        </div>
+                    </div>
+                    <div class="form-card">
+                        <h3>⭐ Niedziele i święta</h3>
+                        <div class="form-group">
+                            <label>Godziny Mszy (każda linia = jedna pozycja)</label>
+                            <textarea id="f-msze-niedziele" rows="6">9:00
+11:30
+14:00</textarea>
+                            <p class="hint">Wpisz same godziny – zostaną wyświetlone jako lista bez notatek.</p>
+                        </div>
+                    </div>
+                    <div class="form-card">
+                        <h3>✝ Sakramenty</h3>
+                        <div class="form-group">
+                            <label>Informacje o sakramentach (każda linia = jeden punkt)</label>
+                            <textarea id="f-msze-sakramenty" rows="6">Spowiedź: codziennie przed Mszą Świętą
+Chrzty: po wcześniejszym uzgodnieniu
+Śluby: po wcześniejszym uzgodnieniu</textarea>
+                            <p class="hint">Format: <code>Nazwa: opis</code>. Zostanie sformatowane z etykietą i opisem.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OGŁOSZENIA -->
+            <div id="sec-ogloszenia" class="admin-section" style="display:none">
+                <h2>📜 Ogłoszenia parafialne</h2>
+                <p class="section-desc">Najnowsze ogłoszenia wyświetlane na stronie głównej.</p>
+                <div class="form-grid">
+                    <div class="form-card" style="grid-column: 1 / -1; max-width: 800px;">
+                        <h3>📜 Treść ogłoszeń</h3>
+                        <div class="form-group">
+                            <label>Tytuł ogłoszeń (np. numer niedzieli i data)</label>
+                            <input type="text" id="f-ogloszenia-tytul" value="XXXII Niedziela Zwykła – 10 sierpnia 2026 r.">
+                        </div>
+                        <div class="form-group">
+                            <label>Treść ogłoszeń (każda linia = jeden punkt)</label>
+                            <textarea id="f-ogloszenia-tresc" rows="10">Dziś po Mszach Świętych zbiórka do puszek na potrzeby misji.
+W tym tygodniu wypada I czwartek miesiąca – adoracja Najświętszego Sakramentu od godz. 17:00.
+Zapraszamy na nabożeństwo fatimskie w dniu 13 sierpnia o godz. 17:30.
+Kancelaria parafialna czynna w poniedziałek, środę i piątek w godz. 16:00–17:00.
+Wszystkich parafian zachęcamy do lektury tygodnika „Gość Niedzielny".</textarea>
+                            <p class="hint">Każda linia zostanie automatycznie ponumerowana i otoczona znacznikiem <code>&lt;p&gt;</code>. Nie musisz dodawać numeracji – system zrobi to za Ciebie.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AKTUALNOŚCI -->
+            <div id="sec-aktualnosci" class="admin-section" style="display:none">
+                <h2>📰 Aktualności / Wydarzenia</h2>
+                <p class="section-desc">Trzy najważniejsze wydarzenia wyświetlane w sekcji „Aktualności" na stronie głównej.</p>
+
+                <div class="akt-card">
+                    <h4><span>1</span> Pierwsze wydarzenie</h4>
+                    <div class="akt-grid">
+                        <div class="form-group">
+                            <label>Dzień (liczba)</label>
+                            <input type="text" id="f-akt-1-dzien" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Miesiąc</label>
+                            <input type="text" id="f-akt-1-miesiac" value="sierpnia">
+                        </div>
+                        <div class="form-group">
+                            <label>Tytuł wydarzenia</label>
+                            <input type="text" id="f-akt-1-tytul" value="Uroczystość Świętego Jakuba Apostoła">
+                        </div>
+                        <div class="form-group">
+                            <label>Opis</label>
+                            <textarea id="f-akt-1-opis" rows="2">Zapraszamy wszystkich parafian na uroczystą sumę odpustową w święto naszego patrona. Po Mszy Świętej procesja wokół kościoła.</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="akt-card">
+                    <h4><span>2</span> Drugie wydarzenie</h4>
+                    <div class="akt-grid">
+                        <div class="form-group">
+                            <label>Dzień (liczba)</label>
+                            <input type="text" id="f-akt-2-dzien" value="15">
+                        </div>
+                        <div class="form-group">
+                            <label>Miesiąc</label>
+                            <input type="text" id="f-akt-2-miesiac" value="sierpnia">
+                        </div>
+                        <div class="form-group">
+                            <label>Tytuł wydarzenia</label>
+                            <input type="text" id="f-akt-2-tytul" value="Wniebowzięcie Najświętszej Maryi Panny">
+                        </div>
+                        <div class="form-group">
+                            <label>Opis</label>
+                            <textarea id="f-akt-2-opis" rows="2">Uroczystość Wniebowzięcia NMP – Msze Święte wg porządku niedzielnego. Zapraszamy do wspólnej modlitwy.</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="akt-card">
+                    <h4><span>3</span> Trzecie wydarzenie</h4>
+                    <div class="akt-grid">
+                        <div class="form-group">
+                            <label>Dzień (liczba)</label>
+                            <input type="text" id="f-akt-3-dzien" value="26">
+                        </div>
+                        <div class="form-group">
+                            <label>Miesiąc</label>
+                            <input type="text" id="f-akt-3-miesiac" value="sierpnia">
+                        </div>
+                        <div class="form-group">
+                            <label>Tytuł wydarzenia</label>
+                            <input type="text" id="f-akt-3-tytul" value="Nawiedzenie obrazu Matki Bożej">
+                        </div>
+                        <div class="form-group">
+                            <label>Opis</label>
+                            <textarea id="f-akt-3-opis" rows="2">W tym dniu odbędzie się specjalne nabożeństwo ku czci Matki Bożej Koziebrodzkiej. Początek o godz. 17:00.</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== HASŁO =====
+const ADMIN_PASS = "koziebrody2026";
+
+function doLogin() {
+    const val = document.getElementById('loginPass').value.trim();
+    if (val === ADMIN_PASS) {
+        localStorage.setItem('parafiaAdminLogged', '1');
+        showPanel();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('loginPass').value = '';
+        document.getElementById('loginPass').focus();
+    }
+}
+function doLogout() {
+    localStorage.removeItem('parafiaAdminLogged');
+    location.reload();
+}
+function showPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadData();
+}
+
+// ===== NAVIGATION =====
+function showSection(id, el) {
+    document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+    document.getElementById('sec-' + id).style.display = 'block';
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
+
+// ===== DATA HELPERS =====
+function getVal(id) { return document.getElementById(id).value; }
+function setVal(id, v) { var el = document.getElementById(id); if(el && v!==null && v!==undefined) el.value = v; }
+
+function linesToHtmlList(lines, type) {
+    return lines.filter(function(l){ return l.trim() !== ''; }).map(function(line, i) {
+        var l = line.trim();
+        if (type === 'ogloszenia') {
+            return '                    <p><strong>' + (i+1) + '.</strong> ' + escapeHtml(l) + '</p>';
+        }
+        if (type === 'sprawy') {
+            return '                        <li>' + escapeHtml(l) + '</li>';
+        }
+        if (type === 'sakramenty') {
+            var parts = l.split(':');
+            if (parts.length >= 2) {
+                return '                        <li><span class="mass-label">' + escapeHtml(parts[0].trim()) + ':</span> <span>' + escapeHtml(parts.slice(1).join(':').trim()) + '</span></li>';
+            }
+            return '                        <li>' + escapeHtml(l) + '</li>';
+        }
+        if (type === 'powszednie') {
+            var m = l.match(/^([\d:]+)\s*(?:\(([^)]+)\))?\s*$/);
+            if (m) {
+                var note = m[2] ? '<span class="mass-note">(' + escapeHtml(m[2]) + ')</span>' : '';
+                return '                        <li><span class="mass-time">' + escapeHtml(m[1]) + '</span> ' + note + '</li>';
+            }
+            return '                        <li>' + escapeHtml(l) + '</li>';
+        }
+        if (type === 'niedziele') {
+            return '                        <li><span class="mass-time">' + escapeHtml(l) + '</span></li>';
+        }
+        return '                        <li>' + escapeHtml(l) + '</li>';
+    }).join('\n');
+}
+
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function nl2br(str) {
+    return escapeHtml(str).replace(/\n/g, '<br>');
+}
+
+// ===== SAVE / LOAD =====
+function collectData() {
+    return {
+        kontaktAdres: getVal('f-kontakt-adres'),
+        kontaktTelefon: getVal('f-kontakt-telefon'),
+        kontaktEmail: getVal('f-kontakt-email'),
+        kontaktDiecezja: getVal('f-kontakt-diecezja'),
+        kancelariaPon: getVal('f-kancelaria-pon'),
+        kancelariaSro: getVal('f-kancelaria-sro'),
+        kancelariaPt: getVal('f-kancelaria-pt'),
+        kancelariaNotatka: getVal('f-kancelaria-notatka'),
+        kancelariaSprawy: getVal('f-kancelaria-sprawy'),
+        mszePowszednie: getVal('f-msze-powszednie'),
+        mszeNiedziele: getVal('f-msze-niedziele'),
+        mszeSakramenty: getVal('f-msze-sakramenty'),
+        ogloszeniaTytul: getVal('f-ogloszenia-tytul'),
+        ogloszeniaTresc: getVal('f-ogloszenia-tresc'),
+        akt1Dzien: getVal('f-akt-1-dzien'),
+        akt1Miesiac: getVal('f-akt-1-miesiac'),
+        akt1Tytul: getVal('f-akt-1-tytul'),
+        akt1Opis: getVal('f-akt-1-opis'),
+        akt2Dzien: getVal('f-akt-2-dzien'),
+        akt2Miesiac: getVal('f-akt-2-miesiac'),
+        akt2Tytul: getVal('f-akt-2-tytul'),
+        akt2Opis: getVal('f-akt-2-opis'),
+        akt3Dzien: getVal('f-akt-3-dzien'),
+        akt3Miesiac: getVal('f-akt-3-miesiac'),
+        akt3Tytul: getVal('f-akt-3-tytul'),
+        akt3Opis: getVal('f-akt-3-opis')
+    };
+}
+
+function saveData() {
+    var data = collectData();
+    localStorage.setItem('parafiaAdminData', JSON.stringify(data));
+    showToast('✅ Zapisano w przeglądarce! Możesz teraz otworzyć podgląd strony.', 'success');
+}
+
+function loadData() {
+    try {
+        var d = JSON.parse(localStorage.getItem('parafiaAdminData') || '{}');
+        if (!d || Object.keys(d).length === 0) return;
+        setVal('f-kontakt-adres', d.kontaktAdres);
+        setVal('f-kontakt-telefon', d.kontaktTelefon);
+        setVal('f-kontakt-email', d.kontaktEmail);
+        setVal('f-kontakt-diecezja', d.kontaktDiecezja);
+        setVal('f-kancelaria-pon', d.kancelariaPon);
+        setVal('f-kancelaria-sro', d.kancelariaSro);
+        setVal('f-kancelaria-pt', d.kancelariaPt);
+        setVal('f-kancelaria-notatka', d.kancelariaNotatka);
+        setVal('f-kancelaria-sprawy', d.kancelariaSprawy);
+        setVal('f-msze-powszednie', d.mszePowszednie);
+        setVal('f-msze-niedziele', d.mszeNiedziele);
+        setVal('f-msze-sakramenty', d.mszeSakramenty);
+        setVal('f-ogloszenia-tytul', d.ogloszeniaTytul);
+        setVal('f-ogloszenia-tresc', d.ogloszeniaTresc);
+        setVal('f-akt-1-dzien', d.akt1Dzien);
+        setVal('f-akt-1-miesiac', d.akt1Miesiac);
+        setVal('f-akt-1-tytul', d.akt1Tytul);
+        setVal('f-akt-1-opis', d.akt1Opis);
+        setVal('f-akt-2-dzien', d.akt2Dzien);
+        setVal('f-akt-2-miesiac', d.akt2Miesiac);
+        setVal('f-akt-2-tytul', d.akt2Tytul);
+        setVal('f-akt-2-opis', d.akt2Opis);
+        setVal('f-akt-3-dzien', d.akt3Dzien);
+        setVal('f-akt-3-miesiac', d.akt3Miesiac);
+        setVal('f-akt-3-tytul', d.akt3Tytul);
+        setVal('f-akt-3-opis', d.akt3Opis);
+    } catch(e) { console.error(e); }
+}
+
+// ===== GENERATE INDEX.HTML =====
+function downloadIndex() {
+    var d = collectData();
+
+    var tmpl = INDEX_TEMPLATE;
+
+    // Kontakt
+    tmpl = tmpl.replace(/__KONTAKT_ADRES__/g, nl2br(d.kontaktAdres));
+    tmpl = tmpl.replace(/__KONTAKT_TELEFON__/g, escapeHtml(d.kontaktTelefon));
+    tmpl = tmpl.replace(/__KONTAKT_EMAIL__/g, escapeHtml(d.kontaktEmail));
+    tmpl = tmpl.replace(/__KONTAKT_DIECEZJA__/g, escapeHtml(d.kontaktDiecezja));
+
+    // Kancelaria
+    tmpl = tmpl.replace(/__KANCELARIA_PON__/g, escapeHtml(d.kancelariaPon));
+    tmpl = tmpl.replace(/__KANCELARIA_SRO__/g, escapeHtml(d.kancelariaSro));
+    tmpl = tmpl.replace(/__KANCELARIA_PT__/g, escapeHtml(d.kancelariaPt));
+    tmpl = tmpl.replace(/__KANCELARIA_NOTATKA__/g, escapeHtml(d.kancelariaNotatka));
+    tmpl = tmpl.replace(/__KANCELARIA_SPRAWY__/g, linesToHtmlList(d.kancelariaSprawy.split('\n'), 'sprawy'));
+
+    // Msze
+    tmpl = tmpl.replace(/__MSZE_POWSZEDNIE__/g, linesToHtmlList(d.mszePowszednie.split('\n'), 'powszednie'));
+    tmpl = tmpl.replace(/__MSZE_NIEDZIELE__/g, linesToHtmlList(d.mszeNiedziele.split('\n'), 'niedziele'));
+    tmpl = tmpl.replace(/__MSZE_SAKRAMENTY__/g, linesToHtmlList(d.mszeSakramenty.split('\n'), 'sakramenty'));
+
+    // Ogłoszenia
+    tmpl = tmpl.replace(/__OGLOSZENIA_TYTUL__/g, escapeHtml(d.ogloszeniaTytul));
+    tmpl = tmpl.replace(/__OGLOSZENIA_TRESC__/g, linesToHtmlList(d.ogloszeniaTresc.split('\n'), 'ogloszenia'));
+
+    // Aktualności
+    tmpl = tmpl.replace(/__AKT1_DZIEN__/g, escapeHtml(d.akt1Dzien));
+    tmpl = tmpl.replace(/__AKT1_MIESIAC__/g, escapeHtml(d.akt1Miesiac));
+    tmpl = tmpl.replace(/__AKT1_TYTUL__/g, escapeHtml(d.akt1Tytul));
+    tmpl = tmpl.replace(/__AKT1_OPIS__/g, escapeHtml(d.akt1Opis));
+    tmpl = tmpl.replace(/__AKT2_DZIEN__/g, escapeHtml(d.akt2Dzien));
+    tmpl = tmpl.replace(/__AKT2_MIESIAC__/g, escapeHtml(d.akt2Miesiac));
+    tmpl = tmpl.replace(/__AKT2_TYTUL__/g, escapeHtml(d.akt2Tytul));
+    tmpl = tmpl.replace(/__AKT2_OPIS__/g, escapeHtml(d.akt2Opis));
+    tmpl = tmpl.replace(/__AKT3_DZIEN__/g, escapeHtml(d.akt3Dzien));
+    tmpl = tmpl.replace(/__AKT3_MIESIAC__/g, escapeHtml(d.akt3Miesiac));
+    tmpl = tmpl.replace(/__AKT3_TYTUL__/g, escapeHtml(d.akt3Tytul));
+    tmpl = tmpl.replace(/__AKT3_OPIS__/g, escapeHtml(d.akt3Opis));
+
+    // Pobierz plik
+    var blob = new Blob([tmpl], {type: 'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('⬇ Pobrano index.html! Wrzuć go na GitHuba, zastępując stary plik.', 'success');
+}
+
+// ===== TOAST =====
+function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || '');
+    setTimeout(function(){ t.classList.add('show'); }, 10);
+    setTimeout(function(){ t.classList.remove('show'); }, 5000);
+}
+
+// ===== INIT =====
+if (localStorage.getItem('parafiaAdminLogged') === '1') {
+    showPanel();
+} else {
+    document.getElementById('loginPass').focus();
+}
+
+// ===== INDEX TEMPLATE (embedded) =====
+const INDEX_TEMPLATE = `<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Parafia pw. Świętego Jakuba Apostoła w Koziebrodach. Sanktuarium Matki Bożej Królowej Nieba.">
+    <title>Parafia pw. Św. Jakuba Apostoła w Koziebrodach</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <img src="images/logo.jpeg" alt="Logo Parafii Koziebrody">
+                <div class="logo-text">
+                    <span class="logo-title">Parafia pw. Św. Jakuba Apostoła</span>
+                    <span class="logo-subtitle">Sanktuarium Matki Bożej Królowej Nieba</span>
+                </div>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#aktualnosci" class="nav-link">Aktualności</a></li>
+                <li><a href="#ogloszenia" class="nav-link">Ogłoszenia</a></li>
+                <li><a href="#msze" class="nav-link">Msze Święte</a></li>
+                <li><a href="#sanktuarium" class="nav-link">Sanktuarium</a></li>
+                <li><a href="#kancelaria" class="nav-link">Kancelaria</a></li>
+                <li><a href="#kontakt" class="nav-link">Kontakt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-image">
+            <img src="images/widok-na-sanktuarium.jpeg" alt="Widok na Sanktuarium w Koziebrodach">
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Parafia pw. Świętego Jakuba Apostoła</h1>
+            <p class="hero-subtitle">Sanktuarium Matki Bożej Królowej Nieba w Koziebrodach</p>
+            <div class="hero-cta">
+                <a href="#msze" class="btn btn-primary">Porządek Mszy</a>
+                <a href="#ogloszenia" class="btn btn-outline">Ogłoszenia</a>
+            </div>
+        </div>
+        <div class="hero-scroll"><span></span></div>
+    </header>
+
+    <section id="aktualnosci" class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Aktualności</span>
+                <h2 class="section-title">Wydarzenia w parafii</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="news-grid">
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">__AKT1_DZIEN__</span>
+                        <span class="month">__AKT1_MIESIAC__</span>
+                    </div>
+                    <div class="news-content">
+                        <h3>__AKT1_TYTUL__</h3>
+                        <p>__AKT1_OPIS__</p>
+                    </div>
+                </article>
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">__AKT2_DZIEN__</span>
+                        <span class="month">__AKT2_MIESIAC__</span>
+                    </div>
+                    <div class="news-content">
+                        <h3>__AKT2_TYTUL__</h3>
+                        <p>__AKT2_OPIS__</p>
+                    </div>
+                </article>
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">__AKT3_DZIEN__</span>
+                        <span class="month">__AKT3_MIESIAC__</span>
+                    </div>
+                    <div class="news-content">
+                        <h3>__AKT3_TYTUL__</h3>
+                        <p>__AKT3_OPIS__</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="ogloszenia" class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Ogłoszenia parafialne</span>
+                <h2 class="section-title">Najnowsze ogłoszenia</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="announcement-box">
+                <div class="announcement-header">
+                    <span class="announcement-icon">📜</span>
+                    <h3>__OGLOSZENIA_TYTUL__</h3>
+                </div>
+                <div class="announcement-body">
+__OGLOSZENIA_TRESC__
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="msze" class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Liturgia</span>
+                <h2 class="section-title">Porządek Mszy Świętych</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="mass-schedule">
+                <div class="mass-card">
+                    <div class="mass-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <h3>Dni powszednie</h3>
+                    <ul class="mass-list">
+__MSZE_POWSZEDNIE__
+                    </ul>
+                </div>
+                <div class="mass-card">
+                    <div class="mass-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l1.5 4.5h4.5l-3.5 2.5 1.5 4.5-4-3-4 3 1.5-4.5-3.5-2.5h4.5z"/></svg>
+                    </div>
+                    <h3>Niedziele i święta</h3>
+                    <ul class="mass-list">
+__MSZE_NIEDZIELE__
+                    </ul>
+                </div>
+                <div class="mass-card">
+                    <div class="mass-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <h3>Sakramenty</h3>
+                    <ul class="mass-list">
+__MSZE_SAKRAMENTY__
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sanktuarium" class="section section-sacred">
+        <div class="container">
+            <div class="sacred-grid">
+                <div class="sacred-image">
+                    <img src="images/obraz-matki-boskiej2.jpeg" alt="Obraz Matki Bożej Królowej Nieba w Koziebrodach">
+                    <div class="sacred-frame"></div>
+                </div>
+                <div class="sacred-content">
+                    <span class="section-tag">Sanktuarium</span>
+                    <h2 class="section-title">Matka Boża Królowa Nieba</h2>
+                    <div class="section-line"></div>
+                    <p class="sacred-text">W naszym kościele znajduje się XVII-wieczna kopia obrazu Matki Boskiej Częstochowskiej, otoczona szczególnym kultem przez pokolenia wiernych. Sanktuarium Matki Bożej Królowej Nieba w Koziebrodach jest miejscem modlitwy, pokoju i wypraszania łask.</p>
+                    <p class="sacred-text">Parafia w Koziebrodach została erygowana w XIV wieku (prawdopodobnie w 1373 r.), co czyni ją jedną z najstarszych w regionie. Obecny kościół w stylu neobarokowym został ukończony w 1880 roku.</p>
+                    <div class="sacred-stats">
+                        <div class="stat"><span class="stat-number">~650</span><span class="stat-label">lat historii parafii</span></div>
+                        <div class="stat"><span class="stat-number">1880</span><span class="stat-label">rok budowy kościoła</span></div>
+                        <div class="stat"><span class="stat-number">XVII w.</span><span class="stat-label">obraz Matki Bożej</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="kancelaria" class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Duszpasterstwo</span>
+                <h2 class="section-title">Kancelaria parafialna</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="office-grid">
+                <div class="office-card">
+                    <h3>🕒 Godziny urzędowania</h3>
+                    <table class="office-hours">
+                        <tr><td>Poniedziałek</td><td>__KANCELARIA_PON__</td></tr>
+                        <tr><td>Środa</td><td>__KANCELARIA_SRO__</td></tr>
+                        <tr><td>Piątek</td><td>__KANCELARIA_PT__</td></tr>
+                    </table>
+                    <p class="office-note">__KANCELARIA_NOTATKA__</p>
+                </div>
+                <div class="office-card">
+                    <h3>📋 Sprawy do załatwienia</h3>
+                    <ul class="office-list">
+__KANCELARIA_SPRAWY__
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="kontakt" class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Kontakt</span>
+                <h2 class="section-title">Skontaktuj się z nami</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <div><strong>Adres</strong><p>__KONTAKT_ADRES__</p></div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📞</span>
+                        <div><strong>Telefon</strong><p>__KONTAKT_TELEFON__</p></div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">✉️</span>
+                        <div><strong>E-mail</strong><p>__KONTAKT_EMAIL__</p></div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">🌐</span>
+                        <div><strong>Diecezja</strong><p>__KONTAKT_DIECEZJA__</p></div>
+                    </div>
+                </div>
+                <div class="contact-map">
+                    <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=19.97%2C52.79%2C20.02%2C52.82&layer=mapnik&marker=52.8028%2C19.9944" width="100%" height="400" style="border:0; border-radius: 12px;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="images/logo.jpeg" alt="Logo" class="footer-logo">
+                    <p>Parafia pw. Świętego Jakuba Apostoła<br>Sanktuarium Matki Bożej Królowej Nieba</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Na skróty</h4>
+                    <ul>
+                        <li><a href="#aktualnosci">Aktualności</a></li>
+                        <li><a href="#ogloszenia">Ogłoszenia</a></li>
+                        <li><a href="#msze">Msze Święte</a></li>
+                        <li><a href="#kontakt">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Sakramenty</h4>
+                    <ul>
+                        <li><a href="#kancelaria">Chrzest święty</a></li>
+                        <li><a href="#kancelaria">Bierzmowanie</a></li>
+                        <li><a href="#kancelaria">Małżeństwo</a></li>
+                        <li><a href="#kancelaria">Pogrzeb</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="admin-year"></span> Parafia pw. Św. Jakuba Apostoła w Koziebrodach. Wszystkie prawa zastrzeżone.</p>
+                <p class="footer-credit">Wykonanie: [Twoje imię] | Hostowane na GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>document.getElementById('admin-year').textContent=new Date().getFullYear();</script>
+</body>
+</html>`;
+</script>
+</body>
+</html>
