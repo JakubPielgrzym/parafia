@@ -4,9 +4,9 @@
    ======================================== */
 
 :root {
-    --color-primary: #6bb5ff;
-    --color-primary-dark: #2c7ac7;
-    --color-primary-light: #8ec8ff;
+    --color-primary: #1e3a5f;
+    --color-primary-dark: #152a45;
+    --color-primary-light: #2c5282;
     --color-accent: #d4af37;
     --color-accent-light: #f0e6c3;
     --color-white: #ffffff;
@@ -180,8 +180,8 @@ body {
     inset: 0;
     background: linear-gradient(
         180deg,
-        rgba(107, 181, 255, 0.4) 0%,
-        rgba(107, 181, 255, 0.7) 100%
+        rgba(107, 181, 255, 0.45) 0%,
+        rgba(107, 181, 255, 0.75) 100%
     );
     z-index: 2;
 }
@@ -309,7 +309,7 @@ body {
 }
 
 .section-sacred {
-    background: var(--color-primary-dark);
+    background: #6bb5ff;
     color: var(--color-white);
 }
 
@@ -385,7 +385,7 @@ body {
     align-items: center;
     min-width: 70px;
     padding: 12px;
-    background: var(--color-primary-dark);
+    background: var(--color-primary);
     color: var(--color-white);
     border-radius: 10px;
     text-align: center;
@@ -767,7 +767,7 @@ body {
    STOPKA
    ======================================== */
 .footer {
-    background: var(--color-primary-dark);
+    background: #6bb5ff;
     color: var(--color-white);
     padding: 80px 0 0;
 }
