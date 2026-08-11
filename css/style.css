@@ -4,9 +4,9 @@
    ======================================== */
 
 :root {
-    --color-primary: #0055AA;
-    --color-primary-dark: #004488;
-    --color-primary-light: #3377CC;
+    --color-primary: #6bb5ff;
+    --color-primary-dark: #2c7ac7;
+    --color-primary-light: #8ec8ff;
     --color-accent: #d4af37;
     --color-accent-light: #f0e6c3;
     --color-white: #ffffff;
@@ -180,8 +180,8 @@ body {
     inset: 0;
     background: linear-gradient(
         180deg,
-        rgba(0, 85, 170, 0.4) 0%,
-        rgba(0, 85, 170, 0.7) 100%
+        rgba(107, 181, 255, 0.4) 0%,
+        rgba(107, 181, 255, 0.7) 100%
     );
     z-index: 2;
 }
@@ -309,7 +309,7 @@ body {
 }
 
 .section-sacred {
-    background: var(--color-primary);
+    background: var(--color-primary-dark);
     color: var(--color-white);
 }
 
@@ -385,7 +385,7 @@ body {
     align-items: center;
     min-width: 70px;
     padding: 12px;
-    background: var(--color-primary);
+    background: var(--color-primary-dark);
     color: var(--color-white);
     border-radius: 10px;
     text-align: center;
