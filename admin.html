@@ -495,10 +495,15 @@ const ADMIN_PASS = "koziebrody2026";
 window.doLogin = doLogin;
 function doLogin() {
     const val = document.getElementById('loginPass').value.trim();
-    if (val === ADMIN_PASS) {
-        localStorage.setItem('parafiaAdminLogged', '1');
+        if (val === ADMIN_PASS) {
         showPanel();
-    } else {
+        try {
+            localStorage.setItem('parafiaAdminLogged', '1');
+        } catch(e) {
+            console.log('localStorage niedostępny, ale panel działa');
+        }
+}
+    else {
         document.getElementById('loginError').style.display = 'block';
         document.getElementById('loginPass').value = '';
         document.getElementById('loginPass').focus();
