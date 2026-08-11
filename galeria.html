@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Galeria zdjęć Parafii pw. Świętego Jakuba Apostoła w Koziebrodach.">
+    <title>Galeria – Parafia pw. Św. Jakuba Apostoła w Koziebrodach</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Dodatkowe style dla galerii */
+        .gallery-hero {
+            position: relative;
+            height: 40vh;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            overflow: hidden;
+        }
+        .gallery-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.08)"/><circle cx="50" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 200px;
+        }
+        .gallery-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--color-white);
+            padding: 0 24px;
+        }
+        .gallery-hero-content h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .gallery-hero-content p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .album-section {
+            padding: 60px 0;
+        }
+        .album-section:nth-child(even) {
+            background: var(--color-gray-50);
+        }
+        .album-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .album-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            color: var(--color-primary);
+        }
+        .album-line {
+            flex: 1;
+            height: 1px;
+            background: var(--color-gray-200);
+        }
+        .album-date {
+            font-size: 0.85rem;
+            color: var(--color-gray-600);
+            font-weight: 500;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 4 / 3;
+            background: var(--color-gray-200);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            font-size: 0.9rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .lightbox-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-prev { left: 24px; }
+        .lightbox-next { right: 24px; }
+        .lightbox-caption {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            max-width: 80vw;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+            .lightbox-nav { width: 40px; height: 40px; font-size: 1rem; }
+            .lightbox-prev { left: 8px; }
+            .lightbox-next { right: 8px; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- Nawigacja -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.jpeg" alt="Logo Parafii Koziebrody">
+                <div class="logo-text">
+                    <span class="logo-title">Parafia pw. Św. Jakuba Apostoła w Koziebrodach</span>
+                    <span class="logo-subtitle">Sanktuarium Matki Bożej Królowej Nieba</span>
+                </div>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#aktualnosci" class="nav-link">Aktualności</a></li>
+                <li><a href="index.html#ogloszenia" class="nav-link">Ogłoszenia</a></li>
+                <li><a href="index.html#msze" class="nav-link">Msze Święte</a></li>
+                <li><a href="index.html#sanktuarium" class="nav-link">Sanktuarium</a></li>
+                <li><a href="index.html#kancelaria" class="nav-link">Kancelaria</a></li>
+                <li><a href="galeria.html" class="nav-link">Galeria</a></li>
+                <li><a href="index.html#kontakt" class="nav-link">Kontakt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="gallery-hero">
+        <div class="gallery-hero-content">
+            <h1>Galeria</h1>
+            <p>Wydarzenia i uroczystości w naszej parafii</p>
+        </div>
+    </header>
+
+    <!-- ALBUMY -->
+    <div id="gallery-content">
+        <!-- Album 1 -->
+        <section class="album-section">
+            <div class="container">
+                <div class="album-header">
+                    <h2>Uroczystość odpustowa</h2>
+                    <div class="album-line"></div>
+                    <span class="album-date">10 sierpnia 2026</span>
+                </div>
+                <div class="gallery-grid">
+                    <div class="gallery-item" onclick="openLightbox(this)">
+                        <img src="images/galeria/odpust-1.jpg" alt="Uroczystość odpustowa" loading="lazy">
+                        <div class="gallery-caption">Procesja wokół kościoła</div>
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox(this)">
+                        <img src="images/galeria/odpust-2.jpg" alt="Uroczystość odpustowa" loading="lazy">
+                        <div class="gallery-caption">Msza Święta odpustowa</div>
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox(this)">
+                        <img src="images/galeria/odpust-3.jpg" alt="Uroczystość odpustowa" loading="lazy">
+                        <div class="gallery-caption">Parafianie podczas uroczystości</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Album 2 -->
+        <section class="album-section">
+            <div class="container">
+                <div class="album-header">
+                    <h2>Nabożeństwo fatimskie</h2>
+                    <div class="album-line"></div>
+                    <span class="album-date">13 sierpnia 2026</span>
+                </div>
+                <div class="gallery-grid">
+                    <div class="gallery-item" onclick="openLightbox(this)">
+                        <img src="images/galeria/fatima-1.jpg" alt="Nabożeństwo fatimskie" loading="lazy">
+                        <div class="gallery-caption">Modlitwa różańcowa</div>
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox(this)">
+                        <img src="images/galeria/fatima-2.jpg" alt="Nabożeństwo fatimskie" loading="lazy">
+                        <div class="gallery-caption">Procesja różańcowa</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Stopka -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="images/logo.jpeg" alt="Logo" class="footer-logo">
+                    <p>Parafia pw. Świętego Jakuba Apostoła<br>Sanktuarium Matki Bożej Królowej Nieba</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Na skróty</h4>
+                    <ul>
+                        <li><a href="index.html#aktualnosci">Aktualności</a></li>
+                        <li><a href="index.html#ogloszenia">Ogłoszenia</a></li>
+                        <li><a href="index.html#msze">Msze Święte</a></li>
+                        <li><a href="index.html#kontakt">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Sakramenty</h4>
+                    <ul>
+                        <li><a href="index.html#kancelaria">Chrzest święty</a></li>
+                        <li><a href="index.html#kancelaria">Bierzmowanie</a></li>
+                        <li><a href="index.html#kancelaria">Małżeństwo</a></li>
+                        <li><a href="index.html#kancelaria">Pogrzeb</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="admin-year"></span> Parafia pw. Św. Jakuba Apostoła w Koziebrodach. Wszystkie prawa zastrzeżone.</p>
+                <p class="footer-credit">Wykonanie: [Twoje imię] | Hostowane na GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+        <button class="lightbox-close" onclick="closeLightbox(event)">×</button>
+        <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1, event)">‹</button>
+        <button class="lightbox-nav lightbox-next" onclick="navLightbox(1, event)">›</button>
+        <img src="" alt="" id="lightbox-img">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.getElementById('admin-year').textContent = new Date().getFullYear();
+
+        // Lightbox
+        let currentIndex = 0;
+        let galleryImages = [];
+
+        function openLightbox(el) {
+            galleryImages = Array.from(document.querySelectorAll('.gallery-item'));
+            currentIndex = galleryImages.indexOf(el);
+            updateLightbox();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateLightbox() {
+            const item = galleryImages[currentIndex];
+            const img = item.querySelector('img');
+            const caption = item.querySelector('.gallery-caption');
+            document.getElementById('lightbox-img').src = img.src;
+            document.getElementById('lightbox-img').alt = img.alt;
+            document.getElementById('lightbox-caption').textContent = caption ? caption.textContent : '';
+        }
+
+        function closeLightbox(e) {
+            if (e.target === document.getElementById('lightbox') || e.target.classList.contains('lightbox-close')) {
+                document.getElementById('lightbox').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function navLightbox(dir, e) {
+            e.stopPropagation();
+            currentIndex = (currentIndex + dir + galleryImages.length) % galleryImages.length;
+            updateLightbox();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (!document.getElementById('lightbox').classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox({target: document.getElementById('lightbox')});
+            if (e.key === 'ArrowLeft') navLightbox(-1, {stopPropagation: function(){}});
+            if (e.key === 'ArrowRight') navLightbox(1, {stopPropagation: function(){}});
+        });
+    </script>
+</body>
+</html>
