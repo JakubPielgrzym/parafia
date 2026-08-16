@@ -310,7 +310,7 @@ body {
 
 .section-sacred {
     background: #6bb5ff;
-    color: var(--color-white);
+    color: var(--color-primary);
 }
 
 .section-header {
@@ -329,7 +329,7 @@ body {
 }
 
 .section-sacred .section-tag {
-    color: var(--color-accent-light);
+    color: var(--color-primary);
 }
 
 .section-title {
@@ -396,6 +396,7 @@ body {
     font-size: 1.6rem;
     font-weight: 700;
     line-height: 1;
+    color: var(--color-white);
 }
 
 .news-date .month {
@@ -403,6 +404,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-top: 4px;
+    color: var(--color-white);
 }
 
 .news-content h3 {
@@ -619,6 +621,10 @@ body {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--color-accent);
+}
+
+.section-sacred .stat-number {
+    color: var(--color-white);
 }
 
 .stat-label {
